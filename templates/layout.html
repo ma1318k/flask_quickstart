@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+<head>
+<title>{{ title }}</title>
+</head>
+<body>
+{% block content %}
+<!-- ここにメインコンテンツを書く -->
+{% if username %}
+  <h1>Hello {{ username }}!</h1>
+{% else %}
+  <h1>Hello, World!</h1>
+{% endif %}
+
+{% endblock %}
+</body>
+</html>

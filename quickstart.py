@@ -1,52 +1,39 @@
-from flask import Flask
-from flask import render_template, redirect, url_for
-from flask import request
-from flask import session
-
-
+import logging
+import uuid
+ 
+from flask import Flask, render_template, request, redirect, session, abort, jsonify
+ 
+CSRF_TOKEN = '_csrf_token'
+ 
 app = Flask(__name__)
-
-# for session
-app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
-
-@app.route('/')
-def root():
-    return redirect(url_for('login'))
-
-@app.errorhandler(404)
-def page_not_found(error):
-    return render_template('page_not_found.html'), 404
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        session['username'] = request.form['username']
-        return redirect(url_for('index'))
-    return '''
-        <form method="post">
-            <p><input type=text name=username>
-            <p><input type=submit value=Login>
-        </form>
-    '''
-
-@app.route('/logout')
-def logout():
-    # remove the username from the session if it's there
-    session.pop('username', None)
-    return redirect(url_for('root'))
-
-@app.route('/index')
-def index():
-    if 'username' in session:
-        username =session["username"]
-        # return f'Logged in as {session["username"]}'
-        return render_template('main.html',username=username)
-    return redirect(url_for('login'))
-
-@app.route('/user/<username>')
-def profile(username):
-    return f'{username}\'s profile'
-
-if __name__ == "__main__":
-    app.debug = True
-    app.run(host='localhost')
+app.secret_key = 'hogehoge'
+ 
+# @app.route('/', methods=['GET'])
+# def redirect_ui_index_with_crsftoken():
+#     response = app.make_response(redirect("main.html"))
+#     # response.set_cookie('XSRF-TOKEN', value=generate_csrf_token()) 
+#     # return response
+#     return render_template('main.html',res= response)
+ 
+@app.route('/api/hello', methods=['POST'])
+def api_hello():
+    name = request.json['params']['name']
+    return jsonify({"result":{"name":name}})
+ 
+# @app.errorhandler(403)
+# @app.errorhandler(500)
+# def server_error(e):
+#     logging.exception(e)
+#     return 'an error occurred.', e.code
+ 
+# @app.before_request
+# def csrf_protect():
+#     if request.method == "POST":
+#         token = session[CSRF_TOKEN]
+#         if not token or token != request.headers.get('X-XSRF-TOKEN'):
+#             abort(403)
+ 
+# def generate_csrf_token():
+#     if CSRF_TOKEN not in session:
+#         session[CSRF_TOKEN] = str(uuid.uuid4())
+#     return session[CSRF_TOKEN]
